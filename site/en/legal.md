@@ -15,13 +15,13 @@ Publication director: Marvin Viverge.
 
 ## Hosting
 
-The website is hosted by GitHub Pages, a service of GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, United States — [github.com](https://github.com).
+The website is hosted on a virtual private server rented from OVH SAS, 2 rue Kellermann, 59100 Roubaix, France — [ovhcloud.com](https://www.ovhcloud.com).
 
 ## Personal data and cookies
 
 The website sets no cookies, uses no analytics and no trackers, and loads no resources from third-party services: fonts are served by the website itself. Search in the docs runs entirely in your browser.
 
-Like any web server, the host processes visitors' IP addresses to deliver pages and keep the service secure; see the [GitHub General Privacy Statement](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement).
+Like any web server, the server records visitors' IP addresses, the requested page and the browser used in its log, to deliver pages and keep the service secure. This log is used for nothing else and is deleted after 14 days.
 
 Download links lead to the releases of the [Marvinviverge/virtum](https://github.com/Marvinviverge/virtum) repository on GitHub.
 

@@ -30,7 +30,20 @@ La documentation reprend le README, `SECURITY.md`, `CHANGELOG.md` et `virtum --h
 
 ## Publication
 
-`develop` reçoit les PR ; une PR `develop` → `main` publie le site sur GitHub Pages (`.github/workflows/deploy.yml`).
+`develop` reçoit les PR ; une PR `develop` → `main` publie le site sur le VPS, comme les autres applis de `vps-infra` :
+
+1. `.github/workflows/deployer.yml` construit l'image (`Dockerfile` : build VitePress, puis nginx avec `docker/nginx.conf`) et la publie sur GHCR, étiquetée par le SHA du commit ;
+2. il se connecte au VPS avec une clé SSH bridée qui ne peut lancer que `deployer-virtum-site <sha>` ;
+3. ce script, le fichier Compose et le site nginx de l'hôte (HTTPS, certificat Let's Encrypt) viennent du dépôt `vps-infra`.
+
+Secrets du dépôt (`VPS_HOTE`, `VPS_UTILISATEUR`, `VPS_EMPREINTE`, `VPS_CLE`) : posés par `make ci-secrets` dans `vps-infra`. Sans eux, l'image est publiée mais pas mise en ligne.
+
+Tester l'image en local :
+
+```bash
+docker build -t virtum-site .
+docker run --rm -p 127.0.0.1:8084:80 virtum-site     # http://127.0.0.1:8084
+```
 
 ## Licence
 

@@ -15,13 +15,13 @@ Directeur de la publication : Marvin Viverge.
 
 ## Hébergeur
 
-Le site est hébergé par GitHub Pages, service de GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis — [github.com](https://github.com).
+Le site est hébergé sur un serveur privé virtuel loué à OVH SAS, 2 rue Kellermann, 59100 Roubaix, France — [ovhcloud.com](https://www.ovhcloud.com).
 
 ## Données personnelles et cookies
 
 Le site ne dépose aucun cookie, n'utilise aucun outil de mesure d'audience ni aucun traqueur, et ne charge aucune ressource depuis un service tiers : les polices sont servies par le site lui-même. La recherche dans la documentation fonctionne entièrement dans votre navigateur.
 
-Comme tout serveur web, l'hébergeur traite l'adresse IP des visiteurs pour délivrer les pages et assurer la sécurité du service ; voir la [déclaration de confidentialité de GitHub](https://docs.github.com/fr/site-policy/privacy-policies/github-general-privacy-statement).
+Comme tout serveur web, le serveur enregistre dans son journal l'adresse IP des visiteurs, la page demandée et le navigateur utilisé, pour délivrer les pages et assurer la sécurité du service. Ce journal n'est utilisé à aucune autre fin et est effacé au bout de 14 jours.
 
 Les liens de téléchargement mènent aux releases du dépôt [Marvinviverge/virtum](https://github.com/Marvinviverge/virtum) sur GitHub.
 
