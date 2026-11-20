@@ -1,0 +1,25 @@
+# main ne reçoit que des PR venant de develop : ce contrôle est obligatoire pour fusionner
+# dans main (règle de protection du dépôt).
+name: Source de la PR
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions: {}
+
+jobs:
+  from-develop:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: La PR vient de develop, dans ce dépôt
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+        run: |
+          if [ "$HEAD_REF" != "develop" ] || [ "$HEAD_REPO" != "$GITHUB_REPOSITORY" ]; then
+            echo "Une PR vers main doit venir de la branche develop de $GITHUB_REPOSITORY (reçu : $HEAD_REPO:$HEAD_REF)."
+            exit 1
+          fi
+          echo "OK : develop → main."
