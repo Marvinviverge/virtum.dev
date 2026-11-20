@@ -1,0 +1,288 @@
+// Textes de l'accueil et de la page de téléchargement, en français et en anglais.
+// Chaque affirmation vient du README, du CHANGELOG, de SECURITY.md ou de `virtum --help`
+// du dépôt Marvinviverge/virtum.
+
+export type Lang = 'fr' | 'en'
+
+export const home = {
+  fr: {
+    links: { docs: '/docs/installation', download: '/telecharger', security: '/docs/securite' },
+    badge: (v: string) => `v${v} — paquet .deb disponible`,
+    title: ['La VM,', 'tout simplement.'],
+    lead: "Virtum lance des machines virtuelles et des labs multi-VM sur votre machine Linux, avec une expérience proche de Docker. Une commande pour une VM, un fichier YAML pour un lab. KVM et libvirt dessous.",
+    install: 'Installer Virtum',
+    readDocs: 'Lire la documentation',
+    meta: 'Apache-2.0 · Linux x86_64 · Rust',
+    terminal: {
+      path: '~/projets/demo',
+      label: 'Terminal : virtum run crée une VM Debian nommée web, puis virtum shell ouvre une session SSH dessus',
+    },
+    how: {
+      eyebrow: 'COMMENT ÇA MARCHE',
+      title: 'Un fichier décrit le lab. Virtum le crée, le montre, le répare.',
+      steps: [
+        { tag: '01 · DÉCRIRE', name: 'Virtumfile' },
+        { tag: '02 · PRÉVOIR', name: 'virtum plan' },
+        { tag: '03 · CRÉER', name: 'virtum up' },
+        { tag: '04 · REVENIR', name: 'virtum snapshot' },
+      ],
+      network: 'réseau isolé du lab',
+      planNote: 'sans rien toucher',
+      snapshot: { name: 'avant-test', broken: '# un test casse db', back: '# retour à l\'état connu' },
+      replay: "Rejouer l'animation",
+    },
+    features: {
+      eyebrow: 'FONCTIONS',
+      title: "Tout ce qu'il faut pour un lab, rien de plus.",
+      items: [
+        { title: 'Labs en un fichier', html: 'Plusieurs machines sur un réseau isolé. <code>plan</code> montre ce qui change, <code>apply</code> l\'applique, création en parallèle.' },
+        { title: 'Réseau et bridge', html: 'Sous-réseau et adresses fixes déclarables, ports redirigés en local, VM directement sur le réseau local en bridge.' },
+        { title: 'Dossiers partagés', html: 'Partages virtiofs, en lecture seule par défaut. L\'écriture se déclare avec <code>:rw</code>.' },
+        { title: 'Ansible intégré', html: 'Le playbook est joué au premier <code>up</code>, l\'inventaire est généré avec les clés SSH de chaque VM.' },
+        { title: 'Instantanés', html: 'Figer une VM ou tout un lab avant un test risqué, puis y revenir en une commande.' },
+        { title: 'Images officielles', html: 'Debian 12, Ubuntu 24.04 et 26.04 : images cloud officielles, vérifiées par empreinte.' },
+      ],
+    },
+    security: {
+      eyebrow: 'SÛR PAR DÉFAUT',
+      title: "L'invité est traité comme un adversaire.",
+      lead: 'Modèle de menace, garanties et limites sont écrits noir sur blanc, chaque garantie étant rattachée au code qui la porte.',
+      link: 'Lire la politique de sécurité →',
+      items: [
+        { title: 'Partages en lecture seule', text: 'Imposé côté hôte. Un partage inscriptible ne peut contenir ni le Virtumfile ni les fichiers Ansible.' },
+        { title: 'Clé SSH épinglée par VM', text: "Une autre VM qui obtient l'adresse d'une VM présente une autre clé : la connexion est refusée." },
+        { title: 'Ansible isolé', text: 'Le playbook tourne sur une copie privée de son dossier, sans les partages inscriptibles.' },
+        { title: 'Binaires vérifiables', text: 'Empreintes SHA-256 et attestation de provenance : le fichier téléchargé vient bien de la CI du dépôt.' },
+      ],
+    },
+    cases: {
+      eyebrow: 'EXEMPLES CONCRETS',
+      title: "Ce que l'on fait avec Virtum, commande par commande.",
+      label: 'Exemples',
+      items: [
+        {
+          title: 'Tester un playbook avant la production',
+          lead: "Le jouer sur des VM neuves, tout casser, revenir à l'état provisionné en une commande.",
+          file: 'Virtumfile',
+          tag: 'Ansible + instantanés',
+          code: 'name: preprod\nansible:\n  playbook: ansible/site.yml\nmachines:\n  web: { os: ubuntu-24.04, groups: [front] }\n  db:  { os: ubuntu-24.04, groups: [data] }\n\n$ virtum up            # crée, provisionne, prend l\'instantané « provisioned »\n$ virtum provision     # rejoue le playbook modifié\n$ virtum snapshot restore provisioned',
+          outcome: "Le playbook tourne sur une copie privée de son dossier ; l'instantané « provisioned » ramène tout le lab à l'état provisionné.",
+        },
+        {
+          title: 'Donner le même lab à chaque participant',
+          lead: 'Un fichier dans le dépôt de la formation, une commande par poste.',
+          file: 'Virtumfile',
+          tag: 'Formation',
+          code: "name: tp-reseau\nmachines:\n  routeur: { os: debian-12, ram: 1024 }\n  client:  { os: debian-12, ram: 1024 }\n  serveur: { os: ubuntu-24.04, ram: 2048 }\n\n$ git clone <dépôt-de-la-formation> && cd tp\n$ virtum up\n$ virtum snapshot create depart     # avant l'exercice\n$ virtum snapshot restore depart    # remise à zéro",
+          outcome: 'Chaque participant obtient les mêmes machines, sur le réseau isolé de son lab, remises à zéro en une commande.',
+        },
+        {
+          title: 'Isoler des machines pour un exercice de sécurité',
+          lead: "Un réseau à part, aucun port ouvert vers l'extérieur sans le déclarer.",
+          file: 'Virtumfile',
+          tag: 'Réseau isolé',
+          code: 'name: exercice\nsubnet: 10.42.0.0/24\nmachines:\n  cible:     { os: debian-12, ip: 10.42.0.10 }\n  attaquant: { os: ubuntu-24.04, ip: 10.42.0.20 }\n\n$ virtum plan     # refuse un sous-réseau qui chevauche un réseau existant\n$ virtum up\n$ virtum shell attaquant',
+          outcome: 'Les ports ne sont exposés que sur 127.0.0.1, sauf « bind: lan » confirmé. Les partages sont en lecture seule par défaut.',
+        },
+        {
+          title: 'Vérifier un correctif sur plusieurs systèmes',
+          lead: 'La même procédure sur Debian et Ubuntu, en VM jetables.',
+          file: 'terminal',
+          tag: 'VM seules',
+          code: '$ virtum run --os debian-12 --name deb\n$ virtum run --os ubuntu-24.04 --name u24\n$ virtum run --os ubuntu-26.04 --name u26\n$ virtum ps\n$ virtum shell deb\n$ virtum destroy deb u24 u26',
+          outcome: 'Images cloud officielles vérifiées par empreinte, disques en copie sur écriture : une VM prête en une minute environ, supprimée en une commande.',
+        },
+      ],
+    },
+    faq: {
+      title: 'Questions fréquentes',
+      items: [
+        { q: 'Sur quels systèmes Virtum fonctionne-t-il ?', a: "Linux x86_64 avec KVM. Validé de bout en bout sur Ubuntu 24.04 ; le paquet s'installe aussi sur Ubuntu 22.04 et Debian 12, sans les dossiers partagés." },
+        { q: 'Faut-il des droits administrateur ?', a: "Seulement pour l'installation et la préparation de l'hôte. Ensuite, Virtum tourne sous votre compte, membre des groupes libvirt et kvm." },
+        { q: 'Virtum est-il gratuit ?', a: 'Oui, et open source sous licence Apache-2.0, y compris pour un usage commercial.' },
+        { q: 'Comment signaler une faille ?', a: 'Par e-mail à security@virtum.dev, ou par un signalement privé sur GitHub.' },
+      ],
+    },
+    cta: { title: 'Votre premier lab en quelques minutes.', button: 'Télécharger' },
+  },
+
+  en: {
+    links: { docs: '/en/docs/installation', download: '/en/download', security: '/en/docs/security' },
+    badge: (v: string) => `v${v} — .deb package available`,
+    title: ['VMs,', 'made simple.'],
+    lead: 'Virtum runs virtual machines and multi-VM labs on your Linux machine, with a Docker-like experience. One command for a VM, one YAML file for a lab. KVM and libvirt underneath.',
+    install: 'Install Virtum',
+    readDocs: 'Read the docs',
+    meta: 'Apache-2.0 · Linux x86_64 · Rust',
+    terminal: {
+      path: '~/projects/demo',
+      label: 'Terminal: virtum run creates a Debian VM named web, then virtum shell opens an SSH session on it',
+    },
+    how: {
+      eyebrow: 'HOW IT WORKS',
+      title: 'One file describes the lab. Virtum creates it, shows it, restores it.',
+      steps: [
+        { tag: '01 · DESCRIBE', name: 'Virtumfile' },
+        { tag: '02 · PREVIEW', name: 'virtum plan' },
+        { tag: '03 · CREATE', name: 'virtum up' },
+        { tag: '04 · ROLL BACK', name: 'virtum snapshot' },
+      ],
+      network: 'isolated lab network',
+      planNote: 'without touching anything',
+      snapshot: { name: 'before-test', broken: '# a test breaks db', back: '# back to a known state' },
+      replay: 'Replay the animation',
+    },
+    features: {
+      eyebrow: 'FEATURES',
+      title: 'Everything a lab needs, nothing more.',
+      items: [
+        { title: 'Labs in one file', html: 'Several machines on an isolated network. <code>plan</code> shows what changes, <code>apply</code> applies it, machines are created in parallel.' },
+        { title: 'Networking and bridge', html: 'Declared subnets and fixed addresses, ports forwarded locally, VMs directly on the local network in bridge mode.' },
+        { title: 'Shared folders', html: 'virtiofs shares, read-only by default. Write access is declared with <code>:rw</code>.' },
+        { title: 'Built-in Ansible', html: "The playbook runs on the first <code>up</code>, and the inventory is generated with each VM's SSH keys." },
+        { title: 'Snapshots', html: 'Freeze a VM or a whole lab before a risky test, then roll back in one command.' },
+        { title: 'Official images', html: 'Debian 12, Ubuntu 24.04 and 26.04: official cloud images, verified by checksum.' },
+      ],
+    },
+    security: {
+      eyebrow: 'SECURE BY DEFAULT',
+      title: 'The guest is treated as an adversary.',
+      lead: 'The threat model, guarantees and limits are written down, and each guarantee is tied to the code that enforces it.',
+      link: 'Read the security policy →',
+      items: [
+        { title: 'Read-only shares', text: 'Enforced on the host. A writable share cannot contain the Virtumfile or the Ansible files.' },
+        { title: 'SSH key pinned per VM', text: "Another VM that gets a VM's address presents a different key: the connection is refused." },
+        { title: 'Isolated Ansible', text: 'The playbook runs from a private copy of its folder, without the writable shares.' },
+        { title: 'Verifiable binaries', text: "SHA-256 checksums and a provenance attestation: the downloaded file really comes from the repository's CI." },
+      ],
+    },
+    cases: {
+      eyebrow: 'REAL-WORLD EXAMPLES',
+      title: 'What people do with Virtum, command by command.',
+      label: 'Examples',
+      items: [
+        {
+          title: 'Test a playbook before production',
+          lead: 'Run it on fresh VMs, break everything, return to the provisioned state in one command.',
+          file: 'Virtumfile',
+          tag: 'Ansible + snapshots',
+          code: 'name: preprod\nansible:\n  playbook: ansible/site.yml\nmachines:\n  web: { os: ubuntu-24.04, groups: [front] }\n  db:  { os: ubuntu-24.04, groups: [data] }\n\n$ virtum up            # creates, provisions, takes the "provisioned" snapshot\n$ virtum provision     # runs the updated playbook again\n$ virtum snapshot restore provisioned',
+          outcome: 'The playbook runs from a private copy of its folder; the "provisioned" snapshot brings the whole lab back to the provisioned state.',
+        },
+        {
+          title: 'Give every participant the same lab',
+          lead: 'One file in the course repository, one command per workstation.',
+          file: 'Virtumfile',
+          tag: 'Training',
+          code: 'name: network-lab\nmachines:\n  router: { os: debian-12, ram: 1024 }\n  client: { os: debian-12, ram: 1024 }\n  server: { os: ubuntu-24.04, ram: 2048 }\n\n$ git clone <course-repository> && cd lab\n$ virtum up\n$ virtum snapshot create start     # before the exercise\n$ virtum snapshot restore start    # reset',
+          outcome: "Every participant gets the same machines, on their lab's own isolated network, reset in one command.",
+        },
+        {
+          title: 'Isolate machines for a security exercise',
+          lead: 'A separate network, no port open to the outside unless declared.',
+          file: 'Virtumfile',
+          tag: 'Isolated network',
+          code: 'name: exercise\nsubnet: 10.42.0.0/24\nmachines:\n  target:   { os: debian-12, ip: 10.42.0.10 }\n  attacker: { os: ubuntu-24.04, ip: 10.42.0.20 }\n\n$ virtum plan     # refuses a subnet that overlaps an existing network\n$ virtum up\n$ virtum shell attacker',
+          outcome: 'Ports are only exposed on 127.0.0.1, unless "bind: lan" is confirmed. Shares are read-only by default.',
+        },
+        {
+          title: 'Check a fix on several systems',
+          lead: 'The same procedure on Debian and Ubuntu, in throwaway VMs.',
+          file: 'terminal',
+          tag: 'Single VMs',
+          code: '$ virtum run --os debian-12 --name deb\n$ virtum run --os ubuntu-24.04 --name u24\n$ virtum run --os ubuntu-26.04 --name u26\n$ virtum ps\n$ virtum shell deb\n$ virtum destroy deb u24 u26',
+          outcome: 'Official cloud images verified by checksum, copy-on-write disks: a VM is ready in about a minute and deleted in one command.',
+        },
+      ],
+    },
+    faq: {
+      title: 'Frequently asked questions',
+      items: [
+        { q: 'Which systems does Virtum run on?', a: 'Linux x86_64 with KVM. Validated end to end on Ubuntu 24.04; the package also installs on Ubuntu 22.04 and Debian 12, without shared folders.' },
+        { q: 'Does it need administrator rights?', a: 'Only to install it and prepare the host. After that, Virtum runs under your own account, as a member of the libvirt and kvm groups.' },
+        { q: 'Is Virtum free?', a: 'Yes, and open source under the Apache-2.0 license, including for commercial use.' },
+        { q: 'How do I report a vulnerability?', a: 'By email to security@virtum.dev, or through a private report on GitHub.' },
+      ],
+    },
+    cta: { title: 'Your first lab in a few minutes.', button: 'Download' },
+  },
+}
+
+export const download = {
+  fr: {
+    title: 'Télécharger Virtum',
+    version: 'Version',
+    notes: 'notes de version',
+    all: 'toutes les versions',
+    tabsLabel: "Méthode d'installation",
+    tabDeb: 'Debian / Ubuntu (.deb)',
+    tabTar: 'Autres distributions (.tar.gz)',
+    debNote: 'apt installe aussi libvirt, QEMU et les outils nécessaires',
+    tarNote: "Binaire, scripts de préparation de l'hôte, documentation, exemple",
+    getDeb: 'Télécharger le .deb',
+    getTar: "Télécharger l'archive",
+    debSteps: [
+      '# 1. Vérifier le fichier (SHA256SUMS dans le même dossier)',
+      '# 2. Installer (libvirt, QEMU, socat… viennent avec)',
+      '# 3. Rejoindre les groupes, puis se reconnecter',
+      "# 4. Préparer le stockage et vérifier l'hôte",
+    ],
+    tarComments: ['', '', '# une fois par machine : paquets, libvirt, groupes', '# ~/.local/bin doit être dans le PATH', '# prépare /var/lib/virtum', ''],
+    req: {
+      title: 'Prérequis',
+      text: 'Linux x86_64 avec KVM activé dans le BIOS/UEFI. Validé sur Ubuntu 24.04. Ubuntu 22.04 et Debian 12 : installation possible, sans dossiers partagés.',
+    },
+    prov: {
+      title: 'Provenance vérifiable',
+      text: 'Chaque fichier est construit par la CI du dépôt et attesté. Avec GitHub CLI 2.49 ou plus :',
+      cmd: 'gh attestation verify <fichier> -R Marvinviverge/virtum',
+    },
+    src: {
+      title: 'Depuis les sources',
+      html: 'Avec Rust installé : clonez le dépôt, puis <code>make install</code> (étapes complètes dans la <a href="/docs/installation#depuis-les-sources">documentation</a>).',
+      link: 'Voir le dépôt →',
+    },
+    next: {
+      title: 'Ensuite',
+      html: 'Lancez votre première VM avec <code>virtum run --os debian-12 --name web</code>, ou suivez le <a href="/docs/premiere-vm">guide de démarrage</a>.',
+    },
+  },
+  en: {
+    title: 'Download Virtum',
+    version: 'Version',
+    notes: 'release notes',
+    all: 'all versions',
+    tabsLabel: 'Installation method',
+    tabDeb: 'Debian / Ubuntu (.deb)',
+    tabTar: 'Other distributions (.tar.gz)',
+    debNote: 'apt also installs libvirt, QEMU and the required tools',
+    tarNote: 'Binary, host setup scripts, documentation, example',
+    getDeb: 'Download the .deb',
+    getTar: 'Download the archive',
+    debSteps: [
+      '# 1. Verify the file (SHA256SUMS in the same folder)',
+      '# 2. Install (libvirt, QEMU, socat… come with it)',
+      '# 3. Join the groups, then log in again',
+      '# 4. Prepare the storage and check the host',
+    ],
+    tarComments: ['', '', '# once per machine: packages, libvirt, groups', '# ~/.local/bin must be in your PATH', '# prepares /var/lib/virtum', ''],
+    req: {
+      title: 'Requirements',
+      text: 'Linux x86_64 with KVM enabled in the BIOS/UEFI. Validated on Ubuntu 24.04. Ubuntu 22.04 and Debian 12: installation works, without shared folders.',
+    },
+    prov: {
+      title: 'Verifiable provenance',
+      text: "Every file is built by the repository's CI and attested. With GitHub CLI 2.49 or newer:",
+      cmd: 'gh attestation verify <file> -R Marvinviverge/virtum',
+    },
+    src: {
+      title: 'From source',
+      html: 'With Rust installed: clone the repository, then <code>make install</code> (full steps in the <a href="/en/docs/installation#from-source">docs</a>).',
+      link: 'See the repository →',
+    },
+    next: {
+      title: 'Next',
+      html: 'Start your first VM with <code>virtum run --os debian-12 --name web</code>, or follow the <a href="/en/docs/first-vm">getting started guide</a>.',
+    },
+  },
+}
