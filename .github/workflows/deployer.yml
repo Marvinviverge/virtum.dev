@@ -1,0 +1,98 @@
+# Mise en ligne sur le VPS à chaque fusion dans main (modèle des applis de vps-infra) : construction de l'image du
+# site, publication sur GHCR étiquetée par le SHA du commit, puis connexion SSH au VPS avec une clé bridée qui ne peut
+# lancer que /usr/local/sbin/deployer-virtum-site (dépôt vps-infra) : le serveur ne fait que récupérer l'image.
+name: Déploiement
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# un seul déploiement à la fois ; un push qui arrive pendant un déploiement attend son tour
+concurrency:
+  group: deploiement-vps
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  image:
+    name: Image
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      packages: write # publier l'image sur GHCR
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/marvinviverge/virtum-site:${{ github.sha }}
+          labels: org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+          # pas d'attestation : elle crée des versions sans étiquette qui encombrent le registre
+          provenance: false
+
+  deployer:
+    name: Mise en ligne
+    needs: image
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions: {}
+    env:
+      CLE: ${{ secrets.VPS_CLE }}
+      HOTE: ${{ secrets.VPS_HOTE }}
+      UTILISATEUR: ${{ secrets.VPS_UTILISATEUR }}
+      EMPREINTE: ${{ secrets.VPS_EMPREINTE }}
+    steps:
+      - name: Secrets du VPS présents
+        id: secrets
+        run: |
+          if [ -z "$CLE" ] || [ -z "$HOTE" ] || [ -z "$UTILISATEUR" ] || [ -z "$EMPREINTE" ]; then
+            echo "::notice::Secrets VPS absents (make ci-secrets dans vps-infra) : image publiée, pas de mise en ligne."
+            echo "pret=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "pret=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Clé et empreinte du VPS
+        if: steps.secrets.outputs.pret == 'true'
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$CLE" > ~/.ssh/vps
+          chmod 600 ~/.ssh/vps
+          # empreinte connue d'avance : jamais de « trust on first use » vers un faux serveur
+          printf '%s %s\n' "$HOTE" "$EMPREINTE" > ~/.ssh/known_hosts
+      - name: Déploiement
+        if: steps.secrets.outputs.pret == 'true'
+        # la clé ne peut lancer que deployer-virtum-site (commande imposée côté VPS) : seul le SHA est transmis
+        run: ssh -T -i ~/.ssh/vps -o IdentitiesOnly=yes -o BatchMode=yes "$UTILISATEUR@$HOTE" "$GITHUB_SHA"
+      - name: Le site répond
+        if: steps.secrets.outputs.pret == 'true'
+        run: |
+          curl -fsS -o /dev/null https://virtum.dev/
+          curl -fsS -o /dev/null https://virtum.dev/en/
+          curl -fsS -o /dev/null https://virtum.dev/docs/installation
+
+  # garde les 5 dernières versions de l'image sur GHCR (de quoi revenir en arrière), supprime le reste
+  nettoyage:
+    name: Ménage GHCR
+    needs: deployer
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      packages: write
+    steps:
+      - uses: actions/delete-package-versions@e5bc658cc4c965c472efe991f8beea3981499c55 # v5.0.0
+        with:
+          package-name: virtum-site
+          package-type: container
+          min-versions-to-keep: 5

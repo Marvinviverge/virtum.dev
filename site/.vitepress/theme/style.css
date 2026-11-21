@@ -1,0 +1,224 @@
+/* Couleurs et polices de la maquette, appliquées au thème par défaut de VitePress. */
+
+:root {
+  --vt-ink: #0f1115;
+  --vt-text-2: #374151;
+  --vt-text-3: #4b5563;
+  --vt-muted: #6b7280;
+  --vt-border: #e5e7eb;
+  --vt-border-strong: #d1d5db;
+  --vt-soft: #f6f7f9;
+  --vt-accent: #0f766e;
+  --vt-accent-hover: #115e59;
+  --vt-accent-soft: #f0fdfa;
+  --vt-term: #0e1116;
+  --vt-term-bar: #161b22;
+  --vt-term-line: #1f2630;
+  --vt-term-text: #e6edf3;
+  --vt-term-dim: #8b949e;
+  --vt-term-green: #3fb950;
+  --vt-term-blue: #79c0ff;
+  --vt-term-red: #f85149;
+
+  --vp-font-family-base: 'Inter Variable', Inter, system-ui, sans-serif;
+  --vp-font-family-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, monospace;
+
+  --vp-c-text-1: var(--vt-ink);
+  --vp-c-text-2: var(--vt-text-3);
+  --vp-c-text-3: var(--vt-muted);
+  --vp-c-divider: var(--vt-border);
+  --vp-c-gutter: var(--vt-border);
+  --vp-c-bg-soft: var(--vt-soft);
+
+  --vp-c-brand-1: var(--vt-accent);
+  --vp-c-brand-2: var(--vt-accent-hover);
+  --vp-c-brand-3: var(--vt-accent);
+  --vp-c-brand-soft: rgba(15, 118, 110, 0.12);
+
+  --vp-code-color: var(--vt-ink);
+  --vp-code-bg: #f3f4f6;
+  --vp-code-block-bg: var(--vt-term);
+  --vp-code-block-color: var(--vt-term-text);
+  --vp-code-copy-code-bg: var(--vt-term-bar);
+  --vp-code-copy-code-hover-bg: var(--vt-term-line);
+  --vp-code-lang-color: var(--vt-term-dim);
+  --vp-code-line-highlight-color: rgba(255, 255, 255, 0.06);
+
+  --vp-c-warning-1: #78350f;
+  --vp-c-warning-soft: #fffbeb;
+  --vp-custom-block-warning-border: #d97706;
+  --vp-c-tip-1: var(--vt-accent);
+  --vp-c-tip-soft: var(--vt-accent-soft);
+
+  --vp-nav-height: 64px;
+  --vp-layout-max-width: 1360px;
+}
+
+/* Logo typographique provisoire : « virtum » en mono */
+.VPNavBarTitle .title {
+  font-family: var(--vp-font-family-mono);
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: -0.02em;
+}
+
+.VPNavBar:not(.has-sidebar) .divider-line,
+.VPNavBar .divider-line {
+  background-color: var(--vt-border);
+}
+.VPNavBar.top .divider-line {
+  background-color: var(--vt-border);
+}
+
+/* Contenu de la documentation */
+.vp-doc h1 {
+  letter-spacing: -0.03em;
+}
+.vp-doc h2 {
+  letter-spacing: -0.02em;
+  border-top: 0;
+  padding-top: 8px;
+}
+.vp-doc a {
+  text-decoration: none;
+}
+.vp-doc a:hover {
+  text-decoration: underline;
+}
+.vp-doc div[class*='language-'] {
+  border-radius: 10px;
+}
+
+/* Encadrés « attention » : ambre de la maquette, bordure à gauche */
+.vp-doc .custom-block.warning,
+.vp-doc .custom-block.tip,
+.vp-doc .custom-block.info {
+  border: 0;
+  border-left: 3px solid;
+  border-radius: 0 8px 8px 0;
+}
+.vp-doc .custom-block.warning {
+  border-left-color: #d97706;
+}
+.vp-doc .custom-block.tip {
+  border-left-color: var(--vt-accent);
+}
+
+/* Lien actif du sommaire : fond menthe et filet d'accent, comme la maquette */
+.VPSidebarItem.is-active > .item > .link {
+  background: var(--vt-accent-soft);
+  box-shadow: inset 2px 0 0 var(--vt-accent);
+  border-radius: 6px;
+  padding-left: 10px;
+  margin-left: -10px;
+}
+.VPSidebarItem.is-active > .item > .link > .text {
+  color: var(--vt-ink);
+  font-weight: 600;
+}
+.VPSidebarItem.level-0 > .item > .text {
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--vt-muted);
+}
+
+/* Pages en mise en page libre (accueil, téléchargement) : pleine largeur */
+.vt-page {
+  font-family: var(--vp-font-family-base);
+  color: var(--vt-ink);
+}
+.vt-page a {
+  color: var(--vt-accent);
+}
+.vt-page a:hover {
+  color: var(--vt-accent-hover);
+}
+.vt-page code,
+.vt-page pre {
+  font-family: var(--vp-font-family-mono);
+}
+.vt-wrap {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+.vt-eyebrow {
+  margin: 0;
+  font-family: var(--vp-font-family-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--vt-accent);
+}
+.vt-h2 {
+  margin: 0;
+  font-size: 36px;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  font-weight: 700;
+}
+.vt-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 22px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  text-decoration: none;
+  border: 1px solid transparent;
+}
+.vt-page a.vt-btn-dark,
+.vt-page a.vt-btn-dark:hover {
+  background: var(--vt-ink);
+  color: #fff;
+}
+.vt-page a.vt-btn-dark:hover {
+  background: #262a33;
+}
+.vt-page a.vt-btn-line {
+  border-color: var(--vt-border-strong);
+  color: var(--vt-ink);
+}
+.vt-page a.vt-btn-line:hover {
+  border-color: var(--vt-ink);
+  color: var(--vt-ink);
+}
+.vt-page a.vt-btn-light,
+.vt-page a.vt-btn-light:hover {
+  background: #fff;
+  color: var(--vt-ink);
+}
+.vt-page :focus-visible {
+  outline: 2px solid var(--vt-accent);
+  outline-offset: 2px;
+}
+
+/* Bloc terminal partagé */
+.vt-term {
+  border-radius: 12px;
+  background: var(--vt-term);
+  color: var(--vt-term-text);
+  overflow: hidden;
+}
+.vt-term pre {
+  margin: 0;
+  padding: 22px 24px;
+  font-size: 14px;
+  line-height: 1.8;
+  overflow-x: auto;
+  color: var(--vt-term-text);
+}
+.vt-c {
+  color: var(--vt-term-dim);
+}
+.vt-ok {
+  color: var(--vt-term-green);
+}
+
+@media (max-width: 640px) {
+  .vt-h2 {
+    font-size: 28px;
+  }
+}
